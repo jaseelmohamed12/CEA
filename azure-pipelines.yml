@@ -1,0 +1,23 @@
+trigger:
+  - development
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+
+  - task: Docker@2
+    displayName: 'Build docker image and push'
+    inputs:
+      repository: treineticprojects/cea-server
+      containerRegistry: docker.hub
+      tags: |
+        dev
+
+  - task: Kubernetes@1
+    inputs:
+      connectionType: 'Kubernetes Service Connection'
+      kubernetesServiceEndpoint: 'kubectl'
+      namespace: 'cea'
+      command:  'rollout'
+      arguments: 'restart deployment cea-server'
